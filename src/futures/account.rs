@@ -27,7 +27,7 @@ pub enum PositionSide {
 }
 
 #[derive(Deserialize, Serialize)]
-#[serde(rename_all = "camelCase")]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum WorkingType {
     MarkPrice,
     ContractPrice,
@@ -189,6 +189,48 @@ impl FuturesAccount {
             activation_price: None,
             callback_rate: None,
             working_type: None,
+            price_protect: None,
+        };
+        self.post_order(order).await
+    }
+
+    // Place a Take Profit order for a long position. Will trigger when price is attained, and then filled at market price.
+    pub async fn set_long_tp(&self, symbol: impl Into<String>, qty: impl Into<f64>, price: f64) -> Result<Transaction> {
+        let order = OrderRequest {
+            symbol: symbol.into(),
+            side: OrderSide::Sell,
+            position_side: Some(PositionSide::Both),
+            order_type: OrderType::TakeProfitMarket,
+            time_in_force: Some(TimeInForce::GteGtc),
+            qty: Some(qty.into()),
+            reduce_only: Some(true),
+            price: None,
+            stop_price: Some(price),
+            close_position: None,
+            activation_price: None,
+            callback_rate: None,
+            working_type: Some(WorkingType::MarkPrice),
+            price_protect: None,
+        };
+        self.post_order(order).await
+    }
+
+    // Place a Stop Loss order for a long position. Will trigger when price is attained, and then filled at market price.
+    pub async fn set_long_sl(&self, symbol: impl Into<String>, qty: impl Into<f64>, price: f64) -> Result<Transaction> {
+        let order = OrderRequest {
+            symbol: symbol.into(),
+            side: OrderSide::Sell,
+            position_side: Some(PositionSide::Both),
+            order_type: OrderType::StopMarket,
+            time_in_force: Some(TimeInForce::GteGtc),
+            qty: Some(qty.into()),
+            reduce_only: Some(true),
+            price: None,
+            stop_price: Some(price),
+            close_position: None,
+            activation_price: None,
+            callback_rate: None,
+            working_type: Some(WorkingType::MarkPrice),
             price_protect: None,
         };
         self.post_order(order).await

@@ -456,6 +456,7 @@ pub struct Loan {
 
 /// How long will an order stay alive
 #[derive(Eq, PartialEq, Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "SCREAMING_SNAKE_CASE")]
 pub enum TimeInForce {
     /// Good Till Canceled
     GTC,
@@ -465,6 +466,8 @@ pub enum TimeInForce {
     FOK,
     /// Good till expired
     GTX,
+    /// Used to create take profit / stop loss orders on futures market, see: https://github.com/jaggedsoft/node-binance-api/issues/614. See: src/futures/account.rs:set_long_tp
+    GteGtc,
     #[serde(other)]
     Other,
 }
